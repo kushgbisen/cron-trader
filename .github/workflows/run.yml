@@ -1,0 +1,42 @@
+name: Cron Trader
+
+on:
+  schedule:
+    # H4 candle closes (UTC) + 5 min buffer
+    - cron: '5 0 * * *'
+    - cron: '5 4 * * *'
+    - cron: '5 8 * * *'
+    - cron: '5 12 * * *'
+    - cron: '5 16 * * *'
+    - cron: '5 20 * * *'
+  
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: pip install pandas numpy requests numba pyyaml
+    
+    - name: Run engine
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: python engine.py
+    
+    - name: Commit trade logs
+      run: |
+        git config --local user.email "bot@cron-trader.local"
+        git config --local user.name "Cron Trader"
+        git add logs/ || true
+        git diff --staged --quiet || git commit -m "📊 $(date -u +'%Y-%m-%d %H:%M') UTC"
+        git push || true

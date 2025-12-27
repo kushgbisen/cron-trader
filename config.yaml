@@ -1,0 +1,21 @@
+# cron-trader configuration
+
+telegram:
+  enabled: true
+  # Secrets loaded from environment:
+  # TELEGRAM_BOT_TOKEN
+  # TELEGRAM_CHAT_ID
+
+# Risk per trade in USD (for P&L calculation)
+default_risk_usd: 500
+
+# Strategies to run
+strategies:
+  h4_breakout_ensemble:
+    enabled: true
+    risk_usd: 500
+    
+  # Add more strategies here:
+  # regime_rsi:
+  #   enabled: false
+  #   risk_usd: 500

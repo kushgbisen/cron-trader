@@ -59,12 +59,29 @@ def send_telegram(message: str) -> bool:
 # =============================================================================
 
 def fetch_ohlcv(symbol: str, timeframe: str = '4h', limit: int = 500) -> pd.DataFrame:
-    """Fetch OHLCV data from Binance"""
-    url = "https://api.binance.com/api/v3/klines"
-    params = {'symbol': symbol, 'interval': timeframe, 'limit': limit}
+    """Fetch OHLCV data from Binance (tries .com first, falls back to .us)"""
     
-    response = requests.get(url, params=params, timeout=30)
-    data = response.json()
+    # Try binance.com first, then binance.us (for GitHub Actions US servers)
+    urls = [
+        "https://api.binance.com/api/v3/klines",
+        "https://api.binance.us/api/v3/klines",
+    ]
+    
+    params = {'symbol': symbol, 'interval': timeframe, 'limit': limit}
+    data = None
+    
+    for url in urls:
+        try:
+            response = requests.get(url, params=params, timeout=30)
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list) and len(data) > 0:
+                    break
+        except:
+            continue
+    
+    if not data or not isinstance(data, list) or len(data) == 0:
+        raise Exception(f"Failed to fetch data for {symbol} from all endpoints")
     
     df = pd.DataFrame(data, columns=[
         'open_time', 'open', 'high', 'low', 'close', 'volume',
@@ -82,9 +99,18 @@ def fetch_ohlcv(symbol: str, timeframe: str = '4h', limit: int = 500) -> pd.Data
 
 
 def get_current_price(symbol: str) -> float:
-    url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
-    r = requests.get(url, timeout=10)
-    return float(r.json()['price'])
+    urls = [
+        f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}",
+        f"https://api.binance.us/api/v3/ticker/price?symbol={symbol}",
+    ]
+    for url in urls:
+        try:
+            r = requests.get(url, timeout=10)
+            if r.status_code == 200:
+                return float(r.json()['price'])
+        except:
+            continue
+    raise Exception(f"Failed to get price for {symbol}")
 
 
 # =============================================================================

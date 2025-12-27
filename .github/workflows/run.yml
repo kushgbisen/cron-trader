@@ -12,6 +12,9 @@ on:
   
   workflow_dispatch:  # Manual trigger
 
+permissions:
+  contents: write  # Allow git push
+
 jobs:
   run:
     runs-on: ubuntu-latest

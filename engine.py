@@ -35,6 +35,98 @@ def load_config() -> dict:
 
 
 # =============================================================================
+# SIGNAL HISTORY LOGGING
+# =============================================================================
+
+def log_signal_check(strategy_name: str, symbol: str, signal_data: dict):
+    """Log every signal check to JSONL file"""
+    log_dir = get_strategy_log_dir(strategy_name)
+    signals_file = log_dir / "signals.jsonl"
+    
+    entry = {
+        'timestamp': datetime.now(timezone.utc).isoformat(),
+        'symbol': symbol,
+        **signal_data
+    }
+    
+    with open(signals_file, 'a') as f:
+        f.write(json.dumps(entry) + '\n')
+
+
+# =============================================================================
+# LEADERBOARD UPDATE
+# =============================================================================
+
+def update_leaderboard():
+    """Update README.md with current stats"""
+    import re
+    readme_path = ROOT / "README.md"
+    
+    if not readme_path.exists():
+        return
+    
+    # Gather stats for each strategy
+    rows = []
+    now = datetime.now(timezone.utc)
+    
+    config = load_config()
+    strategies = config.get('strategies', {})
+    
+    for strategy_name, strat_config in strategies.items():
+        if not strat_config.get('enabled', False):
+            continue
+        
+        trades_df = load_trades(strategy_name)
+        positions = load_positions(strategy_name)
+        
+        if trades_df.empty:
+            rows.append(f"| {strategy_name} | 0 | 0 | -% | $0 | 0.0% | 🟡 Waiting |")
+            continue
+        
+        closed = trades_df[trades_df['status'] == 'CLOSED']
+        
+        total_trades = len(closed)
+        wins = len(closed[closed['pnl_usd'] > 0]) if not closed.empty else 0
+        win_pct = f"{wins/total_trades*100:.0f}%" if total_trades > 0 else "-%"
+        total_pnl = closed['pnl_usd'].sum() if not closed.empty else 0
+        
+        # Calculate max DD (simplified)
+        if not closed.empty:
+            cumsum = closed['pnl_usd'].cumsum()
+            peak = cumsum.cummax()
+            dd = ((peak - cumsum) / 100000 * 100).max()
+        else:
+            dd = 0
+        
+        # Status
+        open_count = len(positions)
+        if total_pnl > 0:
+            status = f"🟢 +${total_pnl:.0f}"
+        elif total_pnl < 0:
+            status = f"🔴 ${total_pnl:.0f}"
+        elif open_count > 0:
+            status = f"📊 {open_count} open"
+        else:
+            status = "🟡 Waiting"
+        
+        rows.append(f"| {strategy_name} | {total_trades} | {wins} | {win_pct} | ${total_pnl:+.0f} | {dd:.1f}% | {status} |")
+    
+    # Build new table
+    table_header = "| Strategy | Trades | Wins | Win% | P&L | Max DD | Status |\n|----------|--------|------|------|-----|--------|--------|"
+    table_rows = "\n".join(rows) if rows else "| No strategies | - | - | - | - | - | - |"
+    new_table = f"{table_header}\n{table_rows}\n\n*Last updated: {now.strftime('%Y-%m-%d %H:%M')} UTC*"
+    
+    # Read and update README
+    content = readme_path.read_text()
+    pattern = r'<!-- LEADERBOARD_START -->.*?<!-- LEADERBOARD_END -->'
+    replacement = f"<!-- LEADERBOARD_START -->\n{new_table}\n<!-- LEADERBOARD_END -->"
+    new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+    readme_path.write_text(new_content)
+    
+    print("\n📊 Leaderboard updated")
+
+
+# =============================================================================
 # TELEGRAM
 # =============================================================================
 
@@ -309,6 +401,7 @@ def run_strategy(strategy_name: str, config: dict):
     for symbol in strat.SYMBOLS:
         if symbol in positions:
             print(f"\n  {symbol}: Already in position")
+            log_signal_check(strategy_name, symbol, {'result': 'SKIP_IN_POSITION'})
             continue
         
         print(f"\n  Checking signal: {symbol}")
@@ -319,6 +412,13 @@ def run_strategy(strategy_name: str, config: dict):
             
             if signal:
                 log_entry(strategy_name, signal, risk_usd)
+                log_signal_check(strategy_name, symbol, {
+                    'result': 'SIGNAL',
+                    'direction': signal['direction'],
+                    'entry': signal['entry'],
+                    'sl': signal['sl'],
+                    'tp': signal['tp']
+                })
                 emoji = '🟢' if signal['direction'] == 'LONG' else '🔴'
                 print(f"    {emoji} SIGNAL: {signal['direction']} @ ${signal['entry']:,.2f}")
                 
@@ -334,9 +434,11 @@ def run_strategy(strategy_name: str, config: dict):
                     f"Candle: {signal['candle_time'][:16]}"
                 )
             else:
+                log_signal_check(strategy_name, symbol, {'result': 'NO_SIGNAL'})
                 print(f"    No signal")
                 
         except Exception as e:
+            log_signal_check(strategy_name, symbol, {'result': 'ERROR', 'error': str(e)})
             print(f"    ⚠️ Error: {e}")
 
 
@@ -392,6 +494,9 @@ def main():
     for strategy_name in enabled:
         strat_config = strategies[strategy_name]
         run_strategy(strategy_name, strat_config)
+    
+    # Update leaderboard in README
+    update_leaderboard()
     
     # Always ping Telegram on run
     telegram_config = config.get('telegram', {})

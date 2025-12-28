@@ -36,6 +36,6 @@ jobs:
       run: |
         git config --local user.email "bot@cron-trader.local"
         git config --local user.name "Cron Trader"
-        git add logs/ || true
+        git add logs/ README.md || true
         git diff --staged --quiet || git commit -m "📊 $(date -u +'%Y-%m-%d %H:%M') UTC"
         git push || true

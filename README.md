@@ -4,15 +4,32 @@ Strategy-agnostic paper trading engine powered by GitHub Actions.
 
 **Cost: $0** - Runs on GitHub Actions free tier.
 
+---
+
+## 📊 Strategy Leaderboard
+
+<!-- LEADERBOARD_START -->
+| Strategy | Trades | Wins | Win% | P&L | Max DD | Status |
+|----------|--------|------|------|-----|--------|--------|
+| h4_breakout_ensemble | 0 | 0 | -% | $0 | 0.0% | 🟡 Waiting |
+| regime_rsi | 0 | 0 | -% | $0 | 0.0% | 🟡 Waiting |
+| weekly_breakout | 0 | 0 | -% | $0 | 0.0% | 🟡 Waiting |
+
+*Last updated: Never*
+<!-- LEADERBOARD_END -->
+
+---
+
 ## How It Works
 
 ```
-Every 4 hours:
+Every hour:
   1. Load enabled strategies
   2. Check open positions for SL/TP exits
   3. Check for new entry signals
-  4. Log trades to CSV
-  5. Send Telegram alerts
+  4. Log trades to CSV + signals to JSONL
+  5. Update leaderboard
+  6. Send Telegram alerts
 ```
 
 ## Structure
@@ -20,11 +37,14 @@ Every 4 hours:
 ```
 cron-trader/
 ├── strategies/           # Drop your strategies here
-│   └── example.py
+│   ├── h4_breakout_ensemble.py
+│   ├── regime_rsi.py
+│   └── weekly_breakout.py
 ├── logs/                 # Auto-generated trade logs
 │   └── {strategy_name}/
 │       ├── trades.csv
-│       └── positions.json
+│       ├── positions.json
+│       └── signals.jsonl    # Signal history
 ├── engine.py             # Core runner
 ├── config.yaml           # Enable/disable strategies
 └── .github/workflows/
@@ -50,7 +70,7 @@ cron-trader/
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_CHAT_ID`
 3. Enable GitHub Actions
-4. Receive signals on Telegram every 4h
+4. Receive signals on Telegram every hour
 
 ## License
 

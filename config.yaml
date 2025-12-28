@@ -16,3 +16,11 @@ strategies:
   weekly_breakout:
     enabled: true
     risk_usd: 500
+  
+  vol_squeeze_sol:
+    enabled: true
+    risk_usd: 500
+  
+  btc_leadlag_eth:
+    enabled: true
+    risk_usd: 500

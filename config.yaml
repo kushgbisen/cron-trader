@@ -25,6 +25,6 @@ strategies:
     enabled: true
     risk_usd: 500
   
-  rsi_divergence:
-    enabled: true
-    risk_usd: 500
+  # rsi_divergence:
+  #   enabled: false
+  #   risk_usd: 500

@@ -340,6 +340,33 @@ def run_strategy(strategy_name: str, config: dict):
             print(f"    ⚠️ Error: {e}")
 
 
+def get_portfolio_summary() -> str:
+    """Get summary of all open positions and stats"""
+    summary_parts = []
+    
+    for strategy_dir in LOGS_DIR.iterdir():
+        if not strategy_dir.is_dir():
+            continue
+        
+        strategy_name = strategy_dir.name
+        positions = load_positions(strategy_name)
+        trades_df = load_trades(strategy_name)
+        
+        if not positions and trades_df.empty:
+            continue
+        
+        # Count stats
+        closed = trades_df[trades_df['status'] == 'CLOSED'] if not trades_df.empty else pd.DataFrame()
+        total_pnl = closed['pnl_usd'].sum() if not closed.empty else 0
+        wins = len(closed[closed['pnl_usd'] > 0]) if not closed.empty else 0
+        total = len(closed) if not closed.empty else 0
+        
+        summary_parts.append(f"<b>{strategy_name}</b>")
+        summary_parts.append(f"  Open: {len(positions)} | Closed: {total} | W: {wins} | P&L: ${total_pnl:+,.0f}")
+    
+    return "\n".join(summary_parts) if summary_parts else "No activity yet"
+
+
 def main():
     now = datetime.now(timezone.utc)
     print("=" * 60)
@@ -359,9 +386,22 @@ def main():
     
     print(f"Enabled strategies: {', '.join(enabled)}")
     
+    # Track if any signals or exits
+    activity = {'signals': 0, 'exits': 0}
+    
     for strategy_name in enabled:
         strat_config = strategies[strategy_name]
         run_strategy(strategy_name, strat_config)
+    
+    # Always ping Telegram on run
+    telegram_config = config.get('telegram', {})
+    if telegram_config.get('ping_on_run', False):
+        summary = get_portfolio_summary()
+        send_telegram(
+            f"🤖 <b>CRON TRADER</b>\n"
+            f"⏰ {now.strftime('%Y-%m-%d %H:%M')} UTC\n\n"
+            f"📊 <b>Portfolio Status:</b>\n{summary}"
+        )
     
     print("\n" + "=" * 60)
     print("✅ Done")

@@ -2,18 +2,14 @@ name: Cron Trader
 
 on:
   schedule:
-    # H4 candle closes (UTC) + 5 min buffer
-    - cron: '5 0 * * *'
-    - cron: '5 4 * * *'
-    - cron: '5 8 * * *'
-    - cron: '5 12 * * *'
-    - cron: '5 16 * * *'
-    - cron: '5 20 * * *'
+    # Run every hour for H1 strategies
+    # H4 strategies will only trigger at H4 closes (0, 4, 8, 12, 16, 20)
+    - cron: '5 * * * *'  # Every hour at :05
   
   workflow_dispatch:  # Manual trigger
 
 permissions:
-  contents: write  # Allow git push
+  contents: write
 
 jobs:
   run:

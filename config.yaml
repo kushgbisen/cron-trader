@@ -2,9 +2,7 @@
 
 telegram:
   enabled: true
-  # Secrets loaded from environment:
-  # TELEGRAM_BOT_TOKEN
-  # TELEGRAM_CHAT_ID
+  ping_on_run: true  # Always send message when CI runs
 
 # Risk per trade in USD (for P&L calculation)
 default_risk_usd: 500
@@ -15,7 +13,10 @@ strategies:
     enabled: true
     risk_usd: 500
     
-  # Add more strategies here:
-  # regime_rsi:
-  #   enabled: false
-  #   risk_usd: 500
+  regime_rsi:
+    enabled: true
+    risk_usd: 500
+    
+  weekly_breakout:
+    enabled: true
+    risk_usd: 500

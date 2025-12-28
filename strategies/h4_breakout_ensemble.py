@@ -96,10 +96,10 @@ def backtest_params(closes, highs, lows, atr, lb, bm, sl, tp, start, end):
 
 @jit(nopython=True)
 def get_top3_params(closes, highs, lows, atr, start, end):
-    lookbacks = (12, 24, 48)
+    lookbacks = (24, 30, 42)    # Optimized range (was 12, 24, 48)
     breakout_mults = (0.0, 0.25, 0.5)
     stop_losses = (1.5, 2.0, 2.5)
-    take_profits = (2.0, 3.0, 4.0)
+    take_profits = (3.0, 4.0, 5.0) # Aim higher (was 2, 3, 4)
     
     results = np.zeros((81, 5))
     idx = 0
@@ -214,8 +214,14 @@ def check_exit(position: dict, df: pd.DataFrame) -> dict | None:
     tp = position['tp']
     direction = position['direction']
     
-    # Check bars held (optional: time-based exit)
-    # For now, just SL/TP
+    # Time-based exit (24 bars = 4 days)
+    entry_time = pd.Timestamp(position['candle_time'])
+    current_time = pd.Timestamp(candle_time)
+    duration = current_time - entry_time
+    
+    # 24 bars * 4 hours = 96 hours
+    if duration.total_seconds() >= 96 * 3600:
+        return {'reason': 'TIME', 'exit_price': candle_close, 'candle_time': candle_time}
     
     if direction == 'LONG':
         if candle_low <= sl:

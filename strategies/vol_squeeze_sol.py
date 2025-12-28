@@ -23,8 +23,9 @@ BB_PERIOD = 20
 BB_STD = 2.0
 KC_PERIOD = 20
 KC_MULT = 1.5
-SL_ATR_MULT = 2.0
+SL_ATR_MULT = 1.5      # Optimized (was 2.0)
 TP_ATR_MULT = 3.0
+MAX_HOLD_BARS = 42     # 7 days (Time exit)
 
 
 def calc_atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
@@ -108,13 +109,24 @@ def check_signal(symbol: str, df: pd.DataFrame) -> dict | None:
 
 
 def check_exit(position: dict, df: pd.DataFrame) -> dict | None:
-    """Check if SL or TP hit"""
+    """Check if SL or TP hit or Time Limit reached"""
     if len(df) < 1:
         return None
     
     curr = df.iloc[-1]
     high = curr['high']
     low = curr['low']
+    close = curr['close']
+    candle_time = str(df.index[-1])
+    
+    # Time-based exit (42 bars = 7 days)
+    entry_time = pd.Timestamp(position['candle_time'])
+    current_time = pd.Timestamp(candle_time)
+    duration = current_time - entry_time
+    
+    # 42 bars * 4 hours = 168 hours
+    if duration.total_seconds() >= 168 * 3600:
+        return {'reason': 'TIME', 'exit_price': close, 'candle_time': candle_time}
     
     sl = position['sl']
     tp = position['tp']

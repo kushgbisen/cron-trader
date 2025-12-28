@@ -1,21 +1,22 @@
 """
-RSI Divergence Strategy - BTC/ETH/SOL
-======================================
+RSI Divergence Strategy - BTC/ETH/SOL/LTC/TRX
+==============================================
 Logic: Bullish Div = Price lower low + RSI higher low → LONG
        Bearish Div = Price higher high + RSI lower high → SHORT
 
-5-Year Backtest (2021-2025):
-- Total P&L: $91,385
-- All 5 years profitable
-- ETH: PF 2.9, WR 66%
-- SOL: PF 2.8, WR 65%
+Full Backtest (2017-2025):
+- LTCUSDT: +$60k, PF 2.80, WR 68%, 8/8 years ⭐
+- TRXUSDT: +$47k, PF 2.49, WR 65%, 8/8 years ⭐
+- ETHUSDT: +$70k, PF 2.9, 9/9 years
+- BTCUSDT: +$65k, PF 2.5, 9/9 years
+- SOLUSDT: +$43k, PF 2.8, 6/6 years
 """
 
 import pandas as pd
 import numpy as np
 
 STRATEGY_NAME = "rsi_divergence"
-SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
+SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "LTCUSDT", "TRXUSDT"]
 TIMEFRAME = "4h"
 
 # Parameters

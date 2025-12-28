@@ -13,10 +13,6 @@ strategies:
     enabled: true
     risk_usd: 500
     
-  regime_rsi:
-    enabled: true
-    risk_usd: 500
-    
   weekly_breakout:
     enabled: true
     risk_usd: 500

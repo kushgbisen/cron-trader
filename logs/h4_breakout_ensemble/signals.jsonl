@@ -124,3 +124,6 @@
 {"timestamp": "2025-12-30T05:28:00.454481+00:00", "symbol": "BTCUSDT", "result": "NO_SIGNAL"}
 {"timestamp": "2025-12-30T05:28:00.780833+00:00", "symbol": "ETHUSDT", "result": "NO_SIGNAL"}
 {"timestamp": "2025-12-30T05:28:01.079323+00:00", "symbol": "SOLUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2025-12-30T06:39:03.093887+00:00", "symbol": "BTCUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2025-12-30T06:39:03.205163+00:00", "symbol": "ETHUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2025-12-30T06:39:03.341904+00:00", "symbol": "SOLUSDT", "result": "NO_SIGNAL"}

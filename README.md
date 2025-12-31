@@ -16,7 +16,7 @@ Strategy-agnostic paper trading engine powered by GitHub Actions.
 | vol_squeeze_sol | 0 | 0 | -% | $+0 | 0.0% | 📊 1 open |
 | btc_leadlag_eth | 0 | 0 | -% | $0 | 0.0% | 🟡 Waiting |
 
-*Last updated: 2025-12-31 12:52 UTC*
+*Last updated: 2025-12-31 13:35 UTC*
 <!-- LEADERBOARD_END -->
 
 ---

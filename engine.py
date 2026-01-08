@@ -145,6 +145,214 @@ def send_telegram(message: str) -> bool:
         print(f"[Telegram] Error: {e}")
         return False
 
+def format_price(price: float, symbol: str = "") -> str:
+    """Format price with appropriate precision"""
+    if 'BTC' in symbol or price > 10000:
+        return f"{price:.2f}"
+    elif 'ETH' in symbol or price > 1000:
+        return f"{price:.2f}" 
+    elif price > 10:
+        return f"{price:.4f}"
+    else:
+        return f"{price:.6f}"
+
+def format_duration(start_time: str, end_time: str = None) -> str:
+    """Format time duration in human readable format"""
+    from datetime import datetime, timezone
+    
+    # Handle non-ISO datetime strings (like candle indices)
+    if start_time.isdigit():
+        return f"{start_time} bars" if not end_time else f"{end_time} bars"
+    
+    try:
+        start = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+        end = datetime.now(timezone.utc) if not end_time else datetime.fromisoformat(end_time.replace('Z', '+00:00'))
+        duration = end - start
+        
+        days = duration.days
+        hours = duration.seconds // 3600
+        minutes = (duration.seconds % 3600) // 60
+        
+        if days > 0:
+            return f"{days}d{hours}h{minutes}m"
+        elif hours > 0:
+            return f"{hours}h{minutes}m"
+        else:
+            return f"{minutes}m"
+    except:
+        return "Unknown"
+
+def create_progress_bar(current: float, target: float, length: int = 10) -> str:
+    """Create a unicode progress bar"""
+    if target <= 0:
+        return "░" * length
+    progress = min(current / target, 1.0)
+    filled = int(progress * length)
+    return "█" * filled + "░" * (length - filled)
+
+def get_position_details(strategy_name: str, config: dict) -> str:
+    """Get detailed position information with current prices"""
+    positions = load_positions(strategy_name)
+    if not positions:
+        return ""
+    
+    details = []
+    for symbol, pos in positions.items():
+        try:
+            current = get_current_price(symbol)
+            entry = pos['entry']
+            direction = pos['direction']
+            sl = pos['sl']
+            tp = pos['tp']
+            
+            # Calculate metrics
+            if direction == 'LONG':
+                pnl_pct = (current - entry) / entry * 100
+                sl_dist_pct = (entry - sl) / entry * 100
+                tp_dist_pct = (tp - current) / entry * 100
+                sl_progress = (entry - current) / (entry - sl) if current < entry else 0
+                tp_progress = (current - entry) / (tp - entry) if current > entry else 0
+                emoji = "🟢" if pnl_pct >= 0 else "🔴"
+            else:  # SHORT
+                pnl_pct = (entry - current) / entry * 100
+                sl_dist_pct = (sl - entry) / entry * 100
+                tp_dist_pct = (current - tp) / entry * 100
+                sl_progress = (current - entry) / (sl - entry) if current > entry else 0
+                tp_progress = (entry - current) / (entry - tp) if current < entry else 0
+                emoji = "🟢" if pnl_pct >= 0 else "🔴"
+            
+            # Risk multiple
+            risk_usd = pos.get('risk_usd', 500)
+            r_multiple = abs(pnl_pct / sl_dist_pct) if sl_dist_pct > 0 else 0
+            pnl_usd = risk_usd * r_multiple if pnl_pct > 0 else -risk_usd * r_multiple
+            
+            # Progress bars
+            show_progress = config.get('telegram', {}).get('show_progress_bars', True)
+            sl_bar = f" {create_progress_bar(sl_progress * 100, 100, 8)} {sl_progress * 100:.0f}%" if show_progress and sl_progress > 0 else ""
+            tp_bar = f" {create_progress_bar(tp_progress * 100, 100, 8)} {tp_progress * 100:.0f}%" if show_progress and tp_progress > 0 else ""
+            
+            # Format details
+            detail = (
+                f"├─ {symbol} {direction} {emoji} [{pnl_pct:+.1f}%]\n"
+                f"│  Entry: ${format_price(entry, symbol)} → ${format_price(current, symbol)}\n"
+                f"│  P&L: ${pnl_usd:+.0f} [+R:{r_multiple:.2f}]\n"
+                f"│  SL: ${format_price(sl, symbol)} {'▼' if direction == 'LONG' else '▲'}{sl_dist_pct:.1f}%{sl_bar}\n"
+                f"│  TP: ${format_price(tp, symbol)} {'▲' if direction == 'LONG' else '▼'}{tp_dist_pct:.1f}%{tp_bar}\n"
+                f"│  Age: {format_duration(pos['candle_time'])}"
+            )
+            details.append(detail)
+        except Exception as e:
+            details.append(f"├─ {symbol} ❌ Error: {str(e)[:30]}")
+    
+    return "\n".join(details)
+
+def get_activity_summary(strategy_name: str, recent_signals: dict) -> str:
+    """Get recent activity summary for strategy"""
+    log_dir = get_strategy_log_dir(strategy_name)
+    signals_file = log_dir / "signals.jsonl"
+    
+    if not signals_file.exists():
+        return ""
+    
+    # Read recent signals (last 20 lines)
+    try:
+        with open(signals_file, 'r') as f:
+            lines = f.readlines()[-20:]
+        
+        recent_checks = []
+        symbols_checked = set()
+        signals_found = 0
+        
+        for line in reversed(lines):
+            data = json.loads(line.strip())
+            symbols_checked.add(data['symbol'])
+            
+            if data.get('result') == 'SIGNAL':
+                signals_found += 1
+                emoji = '🟢' if data['direction'] == 'LONG' else '🔴'
+                recent_checks.append(f"{emoji} {data['symbol']} {data['direction']}")
+        
+        if recent_checks:
+            return f"├─ Checked: {', '.join(symbols_checked)}\n├─ Recent: {', '.join(recent_checks[:3])}"
+        else:
+            return f"├─ Checked: {', '.join(symbols_checked)} | No recent signals"
+    
+    except:
+        return ""
+
+def get_rich_portfolio_summary(config: dict, activity: dict = None) -> str:
+    """Get richly formatted portfolio summary"""
+    summary_parts = []
+    total_pnl = 0
+    total_open = 0
+    total_closed = 0
+    total_wins = 0
+    
+    # Portfolio overview
+    for strategy_dir in LOGS_DIR.iterdir():
+        if not strategy_dir.is_dir():
+            continue
+        
+        strategy_name = strategy_dir.name
+        positions = load_positions(strategy_name)
+        trades_df = load_trades(strategy_name)
+        
+        if not positions and trades_df.empty:
+            continue
+        
+        closed = trades_df[trades_df['status'] == 'CLOSED'] if not trades_df.empty else pd.DataFrame()
+        strategy_pnl = closed['pnl_usd'].sum() if not closed.empty else 0
+        wins = len(closed[closed['pnl_usd'] > 0]) if not closed.empty else 0
+        total_closed += len(closed)
+        total_wins += wins
+        total_pnl += strategy_pnl
+        total_open += len(positions)
+    
+    win_rate = f"{total_wins/total_closed*100:.0f}%" if total_closed > 0 else "0%"
+    
+    # Header
+    now = datetime.now(timezone.utc)
+    header = (
+        f"🤖 CRON TRADER STATUS ────── {now.strftime('%H:%M')} UTC\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    )
+    summary_parts.append(header)
+    
+    # Portfolio overview
+    overview = (
+        f"\n📊 PORTFOLIO OVERVIEW\n"
+        f"├─ Total P&L: ${total_pnl:+.0f}\n"
+        f"├─ Open: {total_open} positions | Closed: {total_closed} trades\n"
+        f"├─ Win Rate: {win_rate}"
+    )
+    summary_parts.append(overview)
+    
+    # Active positions
+    if total_open > 0 and config.get('telegram', {}).get('include_positions_detail', True):
+        positions_detail = "\n🔥 ACTIVE POSITIONS"
+        for strategy_dir in LOGS_DIR.iterdir():
+            if not strategy_dir.is_dir():
+                continue
+            strategy_name = strategy_dir.name
+            strategy_positions = get_position_details(strategy_name, config)
+            if strategy_positions:
+                positions_detail += f"\n{strategy_positions}"
+        summary_parts.append(positions_detail)
+        positions_detail = "└─"
+        summary_parts.append(positions_detail)
+    
+    # Activity summary
+    if activity and config.get('telegram', {}).get('include_activity_summary', True):
+        activity_detail = f"\n⚡ RECENT ACTIVITY\n"
+        if activity.get('signals', 0) > 0 or activity.get('exits', 0) > 0:
+            activity_detail += f"├─ New signals: {activity['signals']}\n"
+            activity_detail += f"├─ Exits: {activity['exits']}\n"
+        else:
+            activity_detail += f"├─ No new activity this run\n"
+        summary_parts.append(activity_detail)
+    
+    return "\n".join(summary_parts)
+
 
 # =============================================================================
 # DATA FETCHING
@@ -263,7 +471,10 @@ def log_entry(strategy_name: str, signal: dict, risk_usd: float):
         'exit_reason': None
     }
     
-    trades_df = pd.concat([trades_df, pd.DataFrame([new_trade])], ignore_index=True)
+    if trades_df.empty:
+        trades_df = pd.DataFrame([new_trade])
+    else:
+        trades_df = pd.concat([trades_df, pd.DataFrame([new_trade])], ignore_index=True)
     save_trades(strategy_name, trades_df)
     
     # Update positions
@@ -358,10 +569,12 @@ def run_strategy(strategy_name: str, config: dict):
         strat = load_strategy(strategy_name)
     except Exception as e:
         print(f"❌ Failed to load: {e}")
-        return
+        return 0, 0  # Return signal_count, exit_count
     
     risk_usd = config.get('risk_usd', 500)
     positions = load_positions(strategy_name)
+    signal_count = 0
+    exit_count = 0
     
     # 1. Check exits for open positions
     for symbol in list(positions.keys()):
@@ -376,13 +589,9 @@ def run_strategy(strategy_name: str, config: dict):
                 pnl_pct, pnl_usd = log_exit(strategy_name, symbol, exit_info, pos)
                 emoji = '✅' if pnl_usd > 0 else '❌'
                 print(f"    {emoji} EXIT: {exit_info['reason']} → ${pnl_usd:+.0f}")
+                exit_count += 1
                 
-                send_telegram(
-                    f"📊 <b>[{strategy_name}] CLOSED</b>\n\n"
-                    f"{emoji} {symbol} {pos['direction']}\n"
-                    f"Exit: {exit_info['reason']} @ ${exit_info['exit_price']:,.2f}\n"
-                    f"P&L: <b>${pnl_usd:+.0f}</b> ({pnl_pct:+.1f}%)"
-                )
+                send_telegram(format_rich_exit(strategy_name, symbol, pos['direction'], exit_info, pnl_usd, pnl_pct, pos['entry']))
             else:
                 current = get_current_price(symbol)
                 if pos['direction'] == 'LONG':
@@ -421,18 +630,12 @@ def run_strategy(strategy_name: str, config: dict):
                 })
                 emoji = '🟢' if signal['direction'] == 'LONG' else '🔴'
                 print(f"    {emoji} SIGNAL: {signal['direction']} @ ${signal['entry']:,.2f}")
+                signal_count += 1
                 
                 sl_pct = abs(signal['entry'] - signal['sl']) / signal['entry'] * 100
                 tp_pct = abs(signal['tp'] - signal['entry']) / signal['entry'] * 100
                 
-                send_telegram(
-                    f"🚨 <b>[{strategy_name}] NEW SIGNAL</b>\n\n"
-                    f"{emoji} <b>{signal['direction']} {symbol}</b>\n"
-                    f"Entry: <code>${signal['entry']:,.2f}</code>\n"
-                    f"SL: <code>${signal['sl']:,.2f}</code> ({sl_pct:.1f}%)\n"
-                    f"TP: <code>${signal['tp']:,.2f}</code> ({tp_pct:.1f}%)\n"
-                    f"Candle: {signal['candle_time'][:16]}"
-                )
+                send_telegram(format_rich_signal(strategy_name, signal))
             else:
                 log_signal_check(strategy_name, symbol, {'result': 'NO_SIGNAL'})
                 print(f"    No signal")
@@ -440,10 +643,12 @@ def run_strategy(strategy_name: str, config: dict):
         except Exception as e:
             log_signal_check(strategy_name, symbol, {'result': 'ERROR', 'error': str(e)})
             print(f"    ⚠️ Error: {e}")
+    
+    return signal_count, exit_count
 
 
 def get_portfolio_summary() -> str:
-    """Get summary of all open positions and stats"""
+    """Get summary of all open positions and stats (legacy - kept for compatibility)"""
     summary_parts = []
     
     for strategy_dir in LOGS_DIR.iterdir():
@@ -468,6 +673,102 @@ def get_portfolio_summary() -> str:
     
     return "\n".join(summary_parts) if summary_parts else "No activity yet"
 
+def should_send_notification(config: dict, activity: dict, now: datetime) -> bool:
+    """Determine if telegram notification should be sent based on config and activity"""
+    telegram_config = config.get('telegram', {})
+    
+    # Check quiet hours
+    quiet_hours = telegram_config.get('quiet_hours', [])
+    if now.hour in quiet_hours:
+        return False
+    
+    notification_level = telegram_config.get('notification_level', 'smart')
+    
+    if notification_level == 'none':
+        return False
+    elif notification_level == 'all':
+        return True
+    elif notification_level == 'daily':
+        # Only send at 9AM and 9PM UTC
+        return now.hour in [9, 21]
+    elif notification_level == 'positions':
+        # Only send if there are open positions
+        total_open = 0
+        for strategy_dir in LOGS_DIR.iterdir():
+            if strategy_dir.is_dir():
+                positions = load_positions(strategy_dir.name)
+                total_open += len(positions)
+        return total_open > 0
+    elif notification_level == 'smart':
+        # Only send if there's actual activity
+        return activity['signals'] > 0 or activity['exits'] > 0
+    
+    return True
+
+def format_rich_signal(strategy_name: str, signal: dict) -> str:
+    """Format signal with rich layout and TradingView link"""
+    symbol = signal['symbol']
+    direction = signal['direction']
+    entry = float(signal['entry'])
+    sl = float(signal['sl'])
+    tp = float(signal['tp'])
+    
+    # Calculate percentages
+    sl_dist = abs(entry - sl)
+    tp_dist = abs(tp - entry)
+    sl_pct = (sl_dist / entry) * 100
+    tp_pct = (tp_dist / entry) * 100
+    rr_ratio = tp_dist / sl_dist if sl_dist > 0 else 0
+    
+    emoji = "🟢" if direction == "LONG" else "🔴"
+    tv_link = f'<a href="https://www.tradingview.com/chart/?symbol=BINANCE:{symbol}">{symbol}</a>'
+    
+    # Box layout
+    message = (
+        f"┌─────────────────────────────────────┐\n"
+        f"│  🚨 SIGNAL: {strategy_name}         │\n"
+        f"├─────────────────────────────────────┤\n"
+        f"│  {emoji} {direction} {tv_link}                 │\n"
+        f"│  Entry: <code>${format_price(entry, symbol)}</code>        │\n"
+        f"│  SL: <code>${format_price(sl, symbol)}</code> {'▼' if direction == 'LONG' else '▲'}{sl_pct:.1f}%           │\n"
+        f"│  TP: <code>${format_price(tp, symbol)}</code> {'▲' if direction == 'LONG' else '▼'}{tp_pct:.1f}%           │\n"
+        f"│  Risk: $500 | RR: 1:{rr_ratio:.1f}      │\n"
+        f"│  Candle: {signal['candle_time'][:16].replace('T', ' ')}     │\n"
+        f"└─────────────────────────────────────┘"
+    )
+    
+    return message
+
+def format_rich_exit(strategy_name: str, symbol: str, direction: str, exit_info: dict, 
+                    pnl_usd: float, pnl_pct: float, entry_price: float) -> str:
+    """Format exit with rich layout"""
+    emoji = "✅" if pnl_usd > 0 else "❌"
+    reason = exit_info['reason']
+    exit_price = float(exit_info['exit_price'])
+    
+    # Duration calculation
+    entry_time = exit_info.get('entry_time', '')
+    if entry_time:
+        duration = format_duration(entry_time, exit_info['candle_time'])
+    else:
+        duration = "Unknown"
+    
+    # Box layout
+    message = (
+        f"┌─────────────────────────────────────┐\n"
+        f"│  📊 CLOSED: {strategy_name}           │\n"
+        f"├─────────────────────────────────────┤\n"
+        f"│  {emoji} {symbol} {direction}                  │\n"
+        f"│  Exit: {reason}                       │\n"
+        f"│  Result: <b>${pnl_usd:+.0f}</b> ({pnl_pct:+.1f}%)  │\n"
+        f"│  Entry: ${format_price(entry_price, symbol)}            │\n"
+        f"│  Exit: <code>${format_price(exit_price, symbol)}</code>              │\n"
+        f"│  Duration: {duration}                  │\n"
+        f"└─────────────────────────────────────┘"
+    )
+    
+    return message
+
 
 def main():
     now = datetime.now(timezone.utc)
@@ -488,25 +789,36 @@ def main():
     
     print(f"Enabled strategies: {', '.join(enabled)}")
     
-    # Track if any signals or exits
+    # Track if any signals or exits for smart notifications
     activity = {'signals': 0, 'exits': 0}
+    
+    # Store signal counts per strategy
+    strategy_activity = {}
     
     for strategy_name in enabled:
         strat_config = strategies[strategy_name]
-        run_strategy(strategy_name, strat_config)
+        
+        # Run strategy and get activity counts
+        signal_count, exit_count = run_strategy(strategy_name, strat_config)
+        
+        strategy_activity[strategy_name] = {
+            'signals': signal_count,
+            'exits': exit_count
+        }
+        activity['signals'] += signal_count
+        activity['exits'] += exit_count
     
     # Update leaderboard in README
     update_leaderboard()
     
-    # Always ping Telegram on run
-    telegram_config = config.get('telegram', {})
-    if telegram_config.get('ping_on_run', False):
-        summary = get_portfolio_summary()
-        send_telegram(
-            f"🤖 <b>CRON TRADER</b>\n"
-            f"⏰ {now.strftime('%Y-%m-%d %H:%M')} UTC\n\n"
-            f"📊 <b>Portfolio Status:</b>\n{summary}"
-        )
+    # Smart notification logic
+    if should_send_notification(config, activity, now):
+        # Use rich formatting for portfolio summary
+        rich_summary = get_rich_portfolio_summary(config, activity)
+        send_telegram(rich_summary)
+        print("\n📱 Telegram notification sent")
+    else:
+        print("\n📱 Telegram notification skipped (no activity or quiet hours)")
     
     print("\n" + "=" * 60)
     print("✅ Done")

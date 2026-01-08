@@ -2,7 +2,11 @@
 
 telegram:
   enabled: true
-  ping_on_run: true  # Always send message when CI runs
+  notification_level: smart  # smart | all | positions | daily | none
+  include_positions_detail: true
+  include_activity_summary: true
+  show_progress_bars: true
+  quiet_hours: []  # UTC hours to suppress notifications: [0,1,2,3,4,5]
 
 # Risk per trade in USD (for P&L calculation)
 default_risk_usd: 500

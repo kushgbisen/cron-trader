@@ -1,0 +1,3 @@
+candle_time,symbol,direction,entry_price,sl,tp,exit_price,exit_candle_time,pnl_pct,pnl_usd,status,exit_reason
+2026-01-08T07:59:59.999000+00:00,BTCUSDT,LONG,90437.07,88261.52714285714,94788.15571428572,,,,,OPEN,
+2026-01-08T07:59:59.999000+00:00,XRPUSDT,LONG,2.1264,1.9935714285714285,2.3920571428571424,,,,,OPEN,

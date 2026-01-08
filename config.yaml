@@ -24,7 +24,11 @@ strategies:
   btc_leadlag_eth:
     enabled: true
     risk_usd: 500
-  
+    
+  regime_rsi:
+    enabled: true
+    risk_usd: 500
+
   # rsi_divergence:
   #   enabled: false
   #   risk_usd: 500

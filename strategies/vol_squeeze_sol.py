@@ -92,7 +92,7 @@ def check_signal(symbol: str, df: pd.DataFrame) -> dict | None:
                 'entry': close,
                 'sl': close - SL_ATR_MULT * atr,
                 'tp': close + TP_ATR_MULT * atr,
-                'candle_time': str(df.index[-1])
+                'candle_time': df.iloc[-1]['close_time'].isoformat()
             }
         else:
             # SHORT signal
@@ -102,7 +102,7 @@ def check_signal(symbol: str, df: pd.DataFrame) -> dict | None:
                 'entry': close,
                 'sl': close + SL_ATR_MULT * atr,
                 'tp': close - TP_ATR_MULT * atr,
-                'candle_time': str(df.index[-1])
+                'candle_time': df.iloc[-1]['close_time'].isoformat()
             }
     
     return None
@@ -117,7 +117,7 @@ def check_exit(position: dict, df: pd.DataFrame) -> dict | None:
     high = curr['high']
     low = curr['low']
     close = curr['close']
-    candle_time = str(df.index[-1])
+    candle_time = curr['close_time'].isoformat()
     
     # Time-based exit (42 bars = 7 days)
     entry_time = pd.Timestamp(position['candle_time'])
@@ -137,26 +137,26 @@ def check_exit(position: dict, df: pd.DataFrame) -> dict | None:
             return {
                 'reason': 'SL',
                 'exit_price': sl,
-                'candle_time': str(df.index[-1])
+                'candle_time': candle_time
             }
         elif high >= tp:
             return {
                 'reason': 'TP',
                 'exit_price': tp,
-                'candle_time': str(df.index[-1])
+                'candle_time': candle_time
             }
     else:  # SHORT
         if high >= sl:
             return {
                 'reason': 'SL',
                 'exit_price': sl,
-                'candle_time': str(df.index[-1])
+                'candle_time': candle_time
             }
         elif low <= tp:
             return {
                 'reason': 'TP',
                 'exit_price': tp,
-                'candle_time': str(df.index[-1])
+                'candle_time': candle_time
             }
     
     return None

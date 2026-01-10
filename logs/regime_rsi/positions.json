@@ -1,12 +1,4 @@
 {
-  "ETHUSDT": {
-    "direction": "LONG",
-    "entry": 3093.13,
-    "sl": 2981.2514285714287,
-    "tp": 3316.887142857143,
-    "candle_time": "2026-01-08T23:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "BNBUSDT": {
     "direction": "LONG",
     "entry": 889.8,

@@ -1,12 +1,4 @@
 {
-  "BNBUSDT": {
-    "direction": "LONG",
-    "entry": 889.8,
-    "sl": 871.0171428571427,
-    "tp": 927.3657142857143,
-    "candle_time": "2026-01-09T15:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "SOLUSDT": {
     "direction": "LONG",
     "entry": 136.34,

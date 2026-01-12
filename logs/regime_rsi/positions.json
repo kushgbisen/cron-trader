@@ -1,12 +1,4 @@
 {
-  "SOLUSDT": {
-    "direction": "LONG",
-    "entry": 136.34,
-    "sl": 133.32857142857145,
-    "tp": 142.36285714285714,
-    "candle_time": "2026-01-11T11:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "XRPUSDT": {
     "direction": "LONG",
     "entry": 2.0601,

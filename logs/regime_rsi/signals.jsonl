@@ -2006,3 +2006,8 @@
 {"timestamp": "2026-01-26T20:32:36.184420+00:00", "symbol": "SOLUSDT", "result": "NO_SIGNAL"}
 {"timestamp": "2026-01-26T20:32:36.352672+00:00", "symbol": "BNBUSDT", "result": "NO_SIGNAL"}
 {"timestamp": "2026-01-26T20:32:36.526648+00:00", "symbol": "XRPUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-01-26T21:29:00.602072+00:00", "symbol": "BTCUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-01-26T21:29:00.942518+00:00", "symbol": "ETHUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-01-26T21:29:01.153207+00:00", "symbol": "SOLUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-01-26T21:29:01.367999+00:00", "symbol": "BNBUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-01-26T21:29:01.566165+00:00", "symbol": "XRPUSDT", "result": "NO_SIGNAL"}

@@ -1,12 +1,4 @@
 {
-  "BTCUSDT": {
-    "direction": "SHORT",
-    "entry": 77919.92,
-    "sl": 81122.05357142857,
-    "tp": 71515.65285714286,
-    "candle_time": "2026-01-31T19:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "SOLUSDT": {
     "direction": "SHORT",
     "entry": 92.45,

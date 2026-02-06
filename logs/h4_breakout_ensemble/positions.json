@@ -1,12 +1,4 @@
 {
-  "BTCUSDT": {
-    "direction": "SHORT",
-    "entry": 67275.63,
-    "sl": 70797.43357142857,
-    "tp": 60936.38357142858,
-    "candle_time": "2026-02-05T15:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "ETHUSDT": {
     "direction": "SHORT",
     "entry": 1960.17,

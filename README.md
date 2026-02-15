@@ -15,9 +15,9 @@ Strategy-agnostic paper trading engine powered by GitHub Actions.
 | weekly_breakout | 26 | 15 | 58% | $+6500 | 3.0% | 🟢 +$6500 |
 | vol_squeeze_sol | 0 | 0 | -% | $+0 | 0.0% | 📊 1 open |
 | btc_leadlag_eth | 0 | 0 | -% | $0 | 0.0% | 🟡 Waiting |
-| regime_rsi | 33 | 13 | 39% | $-565 | 6.1% | 🔴 $-565 |
+| regime_rsi | 34 | 14 | 41% | $+435 | 6.1% | 🟢 +$435 |
 
-*Last updated: 2026-02-15 18:42 UTC*
+*Last updated: 2026-02-15 19:29 UTC*
 <!-- LEADERBOARD_END -->
 
 ---

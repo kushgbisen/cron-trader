@@ -1,12 +1,4 @@
 {
-  "BNBUSDT": {
-    "direction": "SHORT",
-    "entry": 626.84,
-    "sl": 647.34,
-    "tp": 585.84,
-    "candle_time": "2026-02-26T03:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "BTCUSDT": {
     "direction": "SHORT",
     "entry": 68018.05,

@@ -1,20 +1,4 @@
 {
-  "XRPUSDT": {
-    "direction": "LONG",
-    "entry": 1.4367,
-    "sl": 1.380957142857143,
-    "tp": 1.5481857142857145,
-    "candle_time": "2026-03-19T15:59:59.999000+00:00",
-    "risk_usd": 500
-  },
-  "ETHUSDT": {
-    "direction": "LONG",
-    "entry": 2126.75,
-    "sl": 2027.357142857143,
-    "tp": 2325.535714285714,
-    "candle_time": "2026-03-19T15:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "BNBUSDT": {
     "direction": "LONG",
     "entry": 642.07,

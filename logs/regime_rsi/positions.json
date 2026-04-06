@@ -1,12 +1,4 @@
 {
-  "SOLUSDT": {
-    "direction": "SHORT",
-    "entry": 81.26,
-    "sl": 83.20857142857143,
-    "tp": 77.36285714285714,
-    "candle_time": "2026-04-04T19:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "BNBUSDT": {
     "direction": "SHORT",
     "entry": 603.73,

@@ -17,7 +17,7 @@ Strategy-agnostic paper trading engine powered by GitHub Actions.
 | btc_leadlag_eth | 0 | 0 | -% | $0 | 0.0% | 🟡 Waiting |
 | regime_rsi | 68 | 31 | 46% | $+6685 | 6.1% | 🟢 +$6685 |
 
-*Last updated: 2026-04-07 22:42 UTC*
+*Last updated: 2026-04-07 23:41 UTC*
 <!-- LEADERBOARD_END -->
 
 ---

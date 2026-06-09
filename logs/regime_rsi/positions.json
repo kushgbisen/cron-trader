@@ -1,12 +1,4 @@
 {
-  "ETHUSDT": {
-    "direction": "SHORT",
-    "entry": 1675.21,
-    "sl": 1768.6614285714286,
-    "tp": 1488.307142857143,
-    "candle_time": "2026-06-07T23:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "BNBUSDT": {
     "direction": "SHORT",
     "entry": 597.32,

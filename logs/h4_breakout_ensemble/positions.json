@@ -1,12 +1,4 @@
 {
-  "BTCUSDT": {
-    "direction": "LONG",
-    "entry": 65122.06,
-    "sl": 64337.8675,
-    "tp": 66864.70999999999,
-    "candle_time": "2026-06-14T23:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "ETHUSDT": {
     "direction": "LONG",
     "entry": 1808.28,

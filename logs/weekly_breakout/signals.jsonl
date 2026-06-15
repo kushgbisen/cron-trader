@@ -6457,3 +6457,6 @@
 {"timestamp": "2026-06-15T06:28:41.228502+00:00", "symbol": "BTCUSDT", "result": "SKIP_IN_POSITION"}
 {"timestamp": "2026-06-15T06:28:41.228598+00:00", "symbol": "ETHUSDT", "result": "SKIP_IN_POSITION"}
 {"timestamp": "2026-06-15T06:28:41.228663+00:00", "symbol": "SOLUSDT", "result": "SKIP_IN_POSITION"}
+{"timestamp": "2026-06-15T13:19:13.156799+00:00", "symbol": "BTCUSDT", "result": "SKIP_IN_POSITION"}
+{"timestamp": "2026-06-15T13:19:13.405309+00:00", "symbol": "ETHUSDT", "result": "SIGNAL", "direction": "LONG", "entry": 1808.28, "sl": 1754.0067857142856, "tp": 1895.1171428571429}
+{"timestamp": "2026-06-15T13:19:13.922827+00:00", "symbol": "SOLUSDT", "result": "SKIP_IN_POSITION"}

@@ -15,14 +15,6 @@
     "candle_time": "2026-07-02T23:59:59.999000+00:00",
     "risk_usd": 500
   },
-  "XRPUSDT": {
-    "direction": "SHORT",
-    "entry": 1.0983,
-    "sl": 1.1355,
-    "tp": 1.0239,
-    "candle_time": "2026-07-03T07:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "BNBUSDT": {
     "direction": "SHORT",
     "entry": 566.68,

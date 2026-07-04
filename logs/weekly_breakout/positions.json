@@ -7,14 +7,6 @@
     "candle_time": "2026-07-01T15:59:59.999000+00:00",
     "risk_usd": 500
   },
-  "ETHUSDT": {
-    "direction": "LONG",
-    "entry": 1662.98,
-    "sl": 1587.5389285714286,
-    "tp": 1783.685714285714,
-    "candle_time": "2026-07-02T15:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "BTCUSDT": {
     "direction": "LONG",
     "entry": 62305.23,

@@ -7,14 +7,6 @@
     "candle_time": "2026-07-03T15:59:59.999000+00:00",
     "risk_usd": 500
   },
-  "SOLUSDT": {
-    "direction": "SHORT",
-    "entry": 71.73,
-    "sl": 73.31928571428573,
-    "tp": 69.18714285714285,
-    "candle_time": "2026-08-01T19:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "ETHUSDT": {
     "direction": "SHORT",
     "entry": 1838.41,

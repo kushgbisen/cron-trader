@@ -1,0 +1,2 @@
+candle_time,symbol,direction,entry_price,sl,tp,exit_price,exit_candle_time,pnl_pct,pnl_usd,status,exit_reason
+499,ETHUSDT,LONG,1913.38,1878.7942857142857,1965.2585714285715,,,,,OPEN,

@@ -2604,3 +2604,4 @@
 {"timestamp": "2026-08-18T21:27:37.717675+00:00", "symbol": "ETHUSDT", "result": "SIGNAL", "direction": "LONG", "entry": 1913.38, "sl": 1878.7942857142857, "tp": 1965.2585714285715}
 {"timestamp": "2026-08-18T22:26:38.493762+00:00", "symbol": "ETHUSDT", "result": "SKIP_IN_POSITION"}
 {"timestamp": "2026-08-18T23:24:44.196041+00:00", "symbol": "ETHUSDT", "result": "SKIP_IN_POSITION"}
+{"timestamp": "2026-08-19T01:24:58.113173+00:00", "symbol": "ETHUSDT", "result": "SKIP_IN_POSITION"}

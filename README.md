@@ -11,13 +11,13 @@ Strategy-agnostic paper trading engine powered by GitHub Actions.
 <!-- LEADERBOARD_START -->
 | Strategy | Trades | Wins | Win% | P&L | Max DD | Status |
 |----------|--------|------|------|-----|--------|--------|
-| h4_breakout_ensemble | 89 | 36 | 40% | $+3376 | 8.7% | 🟢 +$3376 |
+| h4_breakout_ensemble | 90 | 37 | 41% | $+4109 | 8.7% | 🟢 +$4109 |
 | weekly_breakout | 81 | 37 | 46% | $+7600 | 7.7% | 🟢 +$7600 |
 | vol_squeeze_sol | 0 | 0 | -% | $+0 | 0.0% | 📊 1 open |
 | btc_leadlag_eth | 0 | 0 | -% | $+0 | 0.0% | 📊 1 open |
 | regime_rsi | 116 | 55 | 47% | $+6234 | 6.1% | 🟢 +$6234 |
 
-*Last updated: 2026-08-22 02:56 UTC*
+*Last updated: 2026-08-22 03:44 UTC*
 <!-- LEADERBOARD_END -->
 
 ---

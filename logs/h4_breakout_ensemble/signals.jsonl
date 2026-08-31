@@ -8395,3 +8395,6 @@
 {"timestamp": "2026-08-31T04:37:35.195742+00:00", "symbol": "BTCUSDT", "result": "ERROR", "error": "Failed to fetch data for BTCUSDT from all endpoints"}
 {"timestamp": "2026-08-31T04:37:35.258564+00:00", "symbol": "ETHUSDT", "result": "ERROR", "error": "Failed to fetch data for ETHUSDT from all endpoints"}
 {"timestamp": "2026-08-31T04:37:35.324414+00:00", "symbol": "SOLUSDT", "result": "ERROR", "error": "Failed to fetch data for SOLUSDT from all endpoints"}
+{"timestamp": "2026-08-31T11:27:03.325489+00:00", "symbol": "BTCUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-08-31T11:27:04.040621+00:00", "symbol": "ETHUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-08-31T11:27:04.907309+00:00", "symbol": "SOLUSDT", "result": "NO_SIGNAL"}

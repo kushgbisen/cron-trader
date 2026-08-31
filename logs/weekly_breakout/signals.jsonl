@@ -8392,3 +8392,6 @@
 {"timestamp": "2026-08-30T23:18:04.123485+00:00", "symbol": "BTCUSDT", "result": "SKIP_IN_POSITION"}
 {"timestamp": "2026-08-30T23:18:04.123594+00:00", "symbol": "ETHUSDT", "result": "SKIP_IN_POSITION"}
 {"timestamp": "2026-08-30T23:18:04.423577+00:00", "symbol": "SOLUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-08-31T04:37:35.445054+00:00", "symbol": "BTCUSDT", "result": "SKIP_IN_POSITION"}
+{"timestamp": "2026-08-31T04:37:35.445138+00:00", "symbol": "ETHUSDT", "result": "SKIP_IN_POSITION"}
+{"timestamp": "2026-08-31T04:37:35.503487+00:00", "symbol": "SOLUSDT", "result": "ERROR", "error": "Failed to fetch data for SOLUSDT from all endpoints"}

@@ -1,12 +1,4 @@
 {
-  "SOLUSDT": {
-    "direction": "LONG",
-    "entry": 99.31,
-    "sl": 95.24285714285715,
-    "tp": 107.44428571428571,
-    "candle_time": "2026-09-01T23:59:59.999000+00:00",
-    "risk_usd": 500
-  },
   "ETHUSDT": {
     "direction": "LONG",
     "entry": 2390.82,

@@ -14856,3 +14856,8 @@
 {"timestamp": "2026-11-23T19:04:02.104387+00:00", "symbol": "SOLUSDT", "result": "NO_SIGNAL"}
 {"timestamp": "2026-11-23T19:04:02.754879+00:00", "symbol": "BNBUSDT", "result": "SIGNAL", "direction": "SHORT", "entry": 560.77, "sl": 581.2728571428571, "tp": 519.7642857142856}
 {"timestamp": "2026-11-23T19:04:03.829381+00:00", "symbol": "XRPUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-11-24T04:15:33.729930+00:00", "symbol": "BTCUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-11-24T04:15:33.730035+00:00", "symbol": "ETHUSDT", "result": "SKIP_IN_POSITION"}
+{"timestamp": "2026-11-24T04:15:34.216065+00:00", "symbol": "SOLUSDT", "result": "NO_SIGNAL"}
+{"timestamp": "2026-11-24T04:15:34.216164+00:00", "symbol": "BNBUSDT", "result": "SKIP_IN_POSITION"}
+{"timestamp": "2026-11-24T04:15:34.688030+00:00", "symbol": "XRPUSDT", "result": "NO_SIGNAL"}
